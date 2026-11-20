@@ -1,0 +1,73 @@
+name: Publish website to GitHub Pages
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Do not publish feature branches or tags.
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.26.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Read GitHub Pages settings
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Check graph algorithms
+        run: node --test --experimental-strip-types artifacts/np-hardness-explorer/src/lib/graph.test.ts
+
+      - name: Build static website
+        run: pnpm --filter @workspace/np-hardness-explorer run build
+        env:
+          NODE_ENV: production
+          # Provided by GitHub: handles project sites, root sites, and custom domains.
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          # Vite's shared config validates this, but the built site needs no server.
+          PORT: "4173"
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: artifacts/np-hardness-explorer/dist/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

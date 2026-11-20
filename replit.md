@@ -14,6 +14,7 @@ A static educational website for a university Data Structures and Algorithms fin
 - `pnpm --filter @workspace/np-hardness-explorer run typecheck` — website typecheck
 - `node --test --experimental-strip-types artifacts/np-hardness-explorer/src/lib/graph.test.ts` — graph algorithm tests
 - The shared API/database packages below are unused scaffolding, not requirements of this static website.
+- GitHub Pages setup and build instructions: `docs/github-pages.md`. The workflow publishes only the default branch after Pages is set to use GitHub Actions.
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
 - `pnpm run typecheck` — full typecheck across all packages
