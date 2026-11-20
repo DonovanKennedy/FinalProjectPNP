@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "NP-Hardness Explorer"
+description = "An interactive browser-only graph theory learning tool exploring Independent Set, Clique, Vertex Cover, and computational complexity."
+version = "1.0.0"
+id = "artifacts/np-hardness-explorer"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23934
+
+[services.development]
+run = "pnpm --filter @workspace/np-hardness-explorer run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/np-hardness-explorer", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/np-hardness-explorer/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23934"
+BASE_PATH = "/"

@@ -1,0 +1,1 @@
+- [Educational scope](educational-scope.md) — university graph learning tool; static-only and no worked reduction examples.
